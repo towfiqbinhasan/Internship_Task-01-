@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simple Website Template</title>
     <style>
-        /* পুরো পেজের বেসিক সেটআপ */
+      
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -16,10 +16,10 @@
             min-height: 100vh;
         }
 
-        /* নেভিগেশন বার ডিজাইন */
+      
         .navbar {
             background-color: #0056b3;
-            /* নীল রঙ */
+           
             padding: 15px 0;
             text-align: center;
         }
@@ -41,17 +41,17 @@
             font-weight: bold;
         }
 
-        /* কন্টেইনার সেটআপ (সাইডবার এবং কন্টেন্ট পাশাপাশি রাখার জন্য) */
+       
         .main-container {
             display: flex;
             flex: 1;
         }
 
-        /* সাইডবার ডিজাইন */
+      
         .sidebar {
             width: 20%;
             background-color: #f4f4f9;
-            /* হালকা ধূসর রঙ */
+           
             padding: 20px;
         }
 
@@ -73,7 +73,7 @@
             text-decoration: underline;
         }
 
-        /* মূল কন্টেন্ট ডিজাইন */
+       
         .content {
             width: 80%;
             padding: 40px;
@@ -81,7 +81,7 @@
 
         .content h1 {
             background-color: #4a90e2;
-            /* টাইটেলের ব্যাকগ্রাউন্ড নীল */
+           
             color: white;
             display: inline-block;
             padding: 5px 15px;
@@ -90,16 +90,16 @@
 
         .content p {
             background-color: #4a90e2;
-            /* টেক্সটের ব্যাকগ্রাউন্ড নীল */
+        
             color: white;
             display: inline-block;
             padding: 5px 10px;
         }
 
-        /* ফুটার ডিজাইন */
+       
         .footer {
             background-color: #004080;
-            /* গাঢ় নীল রঙ */
+           
             color: white;
             text-align: center;
             padding: 15px 0;

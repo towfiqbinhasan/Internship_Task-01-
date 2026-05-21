@@ -7,12 +7,11 @@ use Illuminate\Http\Request;
 
 class StudentController extends Controller
 {
-    // Search, Advanced Filter & Render Dashboard
-    public function index(Request $request)
+       public function index(Request $request)
     {
         $query = Student::query();
 
-        // ১. সাধারণ সার্চ
+        
         if ($request->has('search') && $request->search != '') {
             $searchTerm = '%' . $request->search . '%';
             $exactTerm = trim($request->search);
@@ -35,24 +34,23 @@ class StudentController extends Controller
             });
         }
 
-        // ২. জেন্ডার ফিল্টার
+       
         if ($request->has('gender') && $request->gender != '') {
             $query->where('gender', $request->gender);
         }
 
-        // ৩. আলাদা বয়স ফিল্টার
+       
         if ($request->has('age') && $request->age != '') {
             $query->where('age', $request->age);
         }
 
-        // ৪. আলাদা স্কোর ফিল্টার
+     
         if ($request->has('min_score') && $request->min_score != '') {
             $query->where('score', '=', $request->min_score);
         }
 
         $students = $query->orderBy('id', 'desc')->paginate(10);
 
-        // AJAX রিকোয়েস্ট হলে শুধু টেবিল আর মেটা ডেটা পাঠাবে
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('students.table_rows', compact('students'))->render(),
@@ -63,8 +61,12 @@ class StudentController extends Controller
         return view('students.index', compact('students'));
     }
 
-    // Store New Student via AJAX
-    public function store(Request $request)
+      public function create()
+    {
+        return view('students.create');
+    }
+
+        public function store(Request $request)
     {
         $validated = $request->validate([
             'name'          => 'required|string|max:255',
@@ -77,19 +79,27 @@ class StudentController extends Controller
 
         $validated['user_id'] = auth()->id() ?? 1; 
 
-        Student::create($validated);
+        $student = Student::create($validated);
 
-        return response()->json(['success' => 'Student added successfully!']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => 'Student added successfully!', 'student' => $student]);
+        }
+
+        return redirect()->route('student.index')->with('success', 'Student added successfully!');
     }
 
-    // Fetch Student Data for Edit Modal
-    public function edit($id)
+    public function edit(Request $request, $id)
     {
         $student = Student::findOrFail($id);
-        return response()->json($student);
+        
+        if ($request->ajax() || $request->has('ajax') || $request->wantsJson()) {
+            return response()->json($student);
+        }
+
+        return view('students.edit', compact('student'));
     }
 
-    // Update Student Data via AJAX
+   
     public function update(Request $request, $id)
     {
         $student = Student::findOrFail($id);
@@ -109,7 +119,11 @@ class StudentController extends Controller
 
         $student->update($validated);
 
-        return response()->json(['success' => 'Student updated successfully!']);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => 'Student updated successfully!']);
+        }
+
+        return redirect()->route('student.index')->with('success', 'Student updated successfully!');
     }
 
     // Delete Student via AJAX
@@ -120,29 +134,26 @@ class StudentController extends Controller
 
         return response()->json(['success' => 'Student deleted successfully!']);
     }
-   public function quickUpdate(Request $request, $id)
-{
-    // শুধুমাত্র Name, Email এবং Age এর ভ্যালিডেশন
-    $request->validate([
-        'name'  => 'required|string|max:255',
-        'email' => 'required|email|unique:students,email,' . $id,
-        'age'   => 'required|integer|min:1',
-    ]);
 
-    $student = Student::findOrFail($id);
-    
-    // শুধুমাত্র ৩টি ফিল্ড আপডেট হবে
-    $student->update([
-        'name'  => $request->name,
-        'email' => $request->email,
-        'age'   => $request->age,
-    ]);
+    // Quick Update Function via AJAX Modal
+    public function quickUpdate(Request $request, $id)
+    {
+        $request->validate([
+            'name'  => 'required|string|max:255',
+            'email' => 'required|email|unique:students,email,' . $id,
+            'age'   => 'required|integer|min:1',
+        ]);
 
-    return response()->json(['success' => 'Student basic info updated successfully!']);
-}
+        $student = Student::findOrFail($id);
+        
+        $student->update([
+            'name'  => $request->name,
+            'email' => $request->email,
+            'age'   => $request->age,
+        ]);
 
-
-
+        return response()->json(['success' => 'Student basic info updated successfully!']);
+    }
 }
     /*public function adddata()
     {

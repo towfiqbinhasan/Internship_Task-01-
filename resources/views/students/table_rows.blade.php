@@ -16,13 +16,11 @@
         </td>
         <td>{{ $student->score }}</td>
         <td>
-            <!-- মূল ফুল এডিট বাটন -->
-            <button class="btn btn-edit edit-student-btn" data-id="{{ $student->id }}">Edit</button>
+          
+            <button class="btn btn-edit full-edit-student-btn" data-id="{{ $student->id }}">Edit</button>
             
-            <!-- নতুন স্পেসিফিক কুইক এডিট বাটন (Name, Email, Age) -->
             <button class="btn btn-quick-edit quick-edit-student-btn" data-id="{{ $student->id }}">Quick Edit</button>
             
-            <!-- ডিলিট বাটন -->
             <button class="btn btn-delete delete-student-btn" data-id="{{ $student->id }}">Delete</button>
         </td>
     </tr>

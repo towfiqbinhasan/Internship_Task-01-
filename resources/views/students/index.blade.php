@@ -28,7 +28,6 @@
         .content { flex: 1; padding: 40px; text-align: center; }
         .content h1 { color: #0056b3; margin-bottom: 25px; font-size: 28px; }
         
-        /* Filter Container Styling */
         .filter-card { background: #f8f9fa; padding: 20px; border: 1px solid #e9ecef; border-radius: 8px; margin-bottom: 30px; max-width: 900px; margin-left: auto; margin-right: auto; }
         .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 15px; text-align: left; }
         .filter-group { display: flex; flex-direction: column; }
@@ -43,7 +42,7 @@
         .btn-reset:hover { background-color: #5a6268; }
         .btn-add { background-color: #28a745; margin-bottom: 20px; padding: 10px 20px; font-size: 16px;}
         .btn-edit { background-color: #ffc107; color: black; }
-        .btn-quick-edit { background-color: #17a2b8; color: white; } /* নতুন বাটন স্টাইল */
+        .btn-quick-edit { background-color: #17a2b8; color: white; } 
         .btn-delete { background-color: #dc3545; }
         
         .table-container { overflow-x: auto; }
@@ -57,7 +56,6 @@
         .pagination-links nav p { margin-top: 10px; font-size: 14px; color: #555; }
         .pagination-links flex, .pagination-links .flex { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 400px; }
 
-        /* AJAX Shadow Modal Styling */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; justify-content: center; align-items: center; }
         .modal-container { background: white; padding: 30px; border-radius: 8px; max-width: 500px; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: left; position: relative; }
         .modal-container h2 { margin-bottom: 15px; color: #0056b3; }
@@ -82,7 +80,8 @@
             <h2>Sidebar</h2>
             <ul>
                 <li><a href="{{ route('student.index') }}">Students List</a></li>
-                <li><a id="sidebar-add-btn">Add Student</a></li>
+                <!-- রিলোড বন্ধ করার জন্য এখানে আইডি এবং প্রিভেন্ট যুক্ত করা হয়েছে -->
+                <li><a id="sidebar-add-student-btn">Add Student</a></li>
             </ul>
         </div>
 
@@ -126,7 +125,8 @@
             </div>
 
             <div style="text-align: right;">
-                <button id="open-add-modal" class="btn btn-add">Add New Student</button>
+                <!-- রিলোড ছাড়া ওপেন হওয়ার জন্য বাটন করা হলো -->
+                <button type="button" id="add-student-m-btn" class="btn btn-add">Add New Student</button>
             </div>
 
             <div class="table-container">
@@ -156,59 +156,91 @@
         </div>
     </div>
 
-    <!-- SHARED SHADOW MODAL (For Create & Full Edit) -->
-    <div class="modal-overlay" id="student-modal">
+    <!-- ১. ADD NEW STUDENT MODAL -->
+    <div class="modal-overlay" id="add-student-modal">
         <div class="modal-container">
-            <h2 id="modal-title">Add New Student</h2>
-            <div class="error-list" id="modal-errors"></div>
-
-            <form id="student-form">
-                <input type="hidden" id="student-id" name="id">
-                <input type="hidden" id="form-method" name="_method" value="POST">
-
+            <h2>Add New Student</h2>
+            <div class="error-list" id="add-modal-errors"></div>
+            <form id="add-student-form">
                 <div class="form-group">
-                    <label for="m-name">Name</label>
-                    <input type="text" id="m-name" name="name" required>
+                    <label>Name</label>
+                    <input type="text" name="name" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="m-email">Email</label>
-                    <input type="email" id="m-email" name="email" required>
+                    <label>Email</label>
+                    <input type="email" name="email" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="m-age">Age</label>
-                    <input type="number" id="m-age" name="age" required>
+                    <label>Age</label>
+                    <input type="number" name="age" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="m-dob">Date of Birth</label>
-                    <input type="date" id="m-dob" name="date_of_birth" required>
+                    <label>Date of Birth</label>
+                    <input type="date" name="date_of_birth" required>
                 </div>
-
                 <div class="form-group">
-                    <label for="m-gender">Gender</label>
-                    <select id="m-gender" name="gender" required>
+                    <label>Gender</label>
+                    <select name="gender" required>
                         <option value="">Select Gender</option>
                         <option value="M">Male</option>
                         <option value="F">Female</option>
                     </select>
                 </div>
-
                 <div class="form-group">
-                    <label for="m-score">Score</label>
-                    <input type="number" step="0.01" id="m-score" name="score" required>
+                    <label>Score</label>
+                    <input type="number" step="0.01" name="score" required>
                 </div>
-
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-reset" id="close-modal">Cancel</button>
-                    <button type="submit" class="btn btn-add" id="submit-modal-btn" style="background-color: #28a745;">Save</button>
+                    <button type="button" class="btn btn-reset close-add-modal">Cancel</button>
+                    <button type="submit" class="btn btn-add" style="margin-right:0;">Save Student</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- NEW SPECIFIC QUICK EDIT MODAL (Name, Email, Age Only) -->
+    <!-- ২. FULL EDIT STUDENT MODAL -->
+    <div class="modal-overlay" id="full-edit-modal">
+        <div class="modal-container">
+            <h2>Edit Student Information</h2>
+            <div class="error-list" id="full-edit-modal-errors"></div>
+            <form id="full-edit-form">
+                <input type="hidden" id="full-student-id">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="f-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="f-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="f-age" name="age" required>
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="f-dob" name="date_of_birth" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="f-gender" name="gender" required>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Score</label>
+                    <input type="number" step="0.01" id="f-score" name="score" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-reset" id="close-full-modal">Cancel</button>
+                    <button type="submit" class="btn btn-edit" style="margin-right:0; background-color:#ffc107; color:black;">Update Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ৩. QUICK EDIT MODAL -->
     <div class="modal-overlay" id="quick-edit-modal">
         <div class="modal-container">
             <h2>Quick Edit Student</h2>
@@ -247,17 +279,14 @@
     <!-- AJAX CRUD SCRIPT -->
     <script>
         $(document).ready(function() {
-            // Setup CSRF Token for AJAX
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
 
-            // Toastr Setup
             toastr.options = { "closeButton": true, "progressBar": true, "positionClass": "toast-top-right", "timeOut": "4000" };
 
-            // Function to fetch data smoothly via AJAX (Filter & Pagination)
             function fetchStudents(url) {
                 $.ajax({
                     url: url,
@@ -272,81 +301,122 @@
                 });
             }
 
-            // Real-time or Form Filter Submit
+            // Filter Form Submit
             $('#filter-form').on('submit', function(e) {
                 e.preventDefault();
                 let url = $(this).attr('action') + '?' + $(this).serialize();
                 fetchStudents(url);
             });
 
-            // Pagination Link Click Control
+            // Pagination Controls
             $(document).on('click', '.pagination-links a', function(e) {
                 e.preventDefault();
                 let url = $(this).attr('href');
                 fetchStudents(url);
             });
 
-            // Open Modal for Create
-            function openCreateModal() {
-                $('#student-form')[0].reset();
-                $('#student-id').val('');
-                $('#form-method').val('POST');
-                $('#modal-title').text('Add New Student');
-                $('#submit-modal-btn').text('Save Student').css('background-color', '#28a745').css('color', 'white');
-                $('#modal-errors').hide().empty();
-                $('#student-modal').css('display', 'flex');
-            }
-
-            $('#open-add-modal, #sidebar-add-btn').on('click', function() {
-                openCreateModal();
+            // --- ADD STUDENT AJAX ---
+            $('#add-student-m-btn, #sidebar-add-student-btn').on('click', function(e) {
+                e.preventDefault();
+                $('#add-modal-errors').hide().empty();
+                $('#add-student-form')[0].reset();
+                $('#add-student-modal').css('display', 'flex');
             });
 
-            // Close Modals
-            $('#close-modal, #student-modal').on('click', function(e) {
-                if (e.target === this) { $('#student-modal').hide(); }
-            });
-            $('#close-quick-modal, #quick-edit-modal').on('click', function(e) {
-                if (e.target === this) { $('#quick-edit-modal').hide(); }
+            $('.close-add-modal, #add-student-modal').on('click', function(e) {
+                if (e.target === this) { $('#add-student-modal').hide(); }
             });
 
-            // Open Modal for Full Edit via AJAX Fetch
-            $(document).on('click', '.edit-student-btn', function() {
-                let id = $(this).data('id');
-                $('#modal-errors').hide().empty();
-
+            $('#add-student-form').on('submit', function(e) {
+                e.preventDefault();
                 $.ajax({
-                    url: `/student/${id}/edit`,
-                    type: 'GET',
-                    success: function(data) {
-                        $('#student-id').val(data.id);
-                        $('#form-method').val('PUT');
-                        $('#m-name').val(data.name);
-                        $('#m-email').val(data.email);
-                        $('#m-age').val(data.age);
-                        $('#m-dob').val(data.date_of_birth);
-                        $('#m-gender').val(data.gender);
-                        $('#m-score').val(data.score);
-
-                        $('#modal-title').text('Edit Student Information');
-                        $('#submit-modal-btn').text('Update Student').css('background-color', '#ffc107').css('color', 'black');
-                        $('#student-modal').css('display', 'flex');
+                    url: "{{ route('student.store') }}",
+                    type: "POST",
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#add-student-modal').hide();
+                        toastr.success("Student added successfully!");
+                        fetchStudents("{{ route('student.index') }}");
                     },
-                    error: function() {
-                        toastr.error("Failed to fetch data.");
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorHtml = '<ul style="list-style:none; padding-left:0;">';
+                            $.each(errors, function(key, val) { errorHtml += `<li>⚠️ ${val[0]}</li>`; });
+                            errorHtml += '</ul>';
+                            $('#add-modal-errors').html(errorHtml).show();
+                        } else {
+                            toastr.error("Something went wrong.");
+                        }
                     }
                 });
             });
 
-            // ==========================================
-            // NEW: Open Modal for SPECIFIC QUICK EDIT
-            // ==========================================
+            // --- FULL EDIT AJAX ---
+            $(document).on('click', '.full-edit-student-btn', function(e) {
+                e.preventDefault();
+                let id = $(this).data('id');
+                $('#full-edit-modal-errors').hide().empty();
+
+                $.ajax({
+                    url: `/student/${id}/edit`,
+                    type: 'GET',
+                    data: { ajax: true },
+                    success: function(data) {
+                        $('#full-student-id').val(data.id);
+                        $('#f-name').val(data.name);
+                        $('#f-email').val(data.email);
+                        $('#f-age').val(data.age);
+                        $('#f-dob').val(data.date_of_birth);
+                        $('#f-gender').val(data.gender);
+                        $('#f-score').val(data.score);
+
+                        $('#full-edit-modal').css('display', 'flex');
+                    },
+                    error: function() { toastr.error("Failed to fetch data."); }
+                });
+            });
+
+            $('#close-full-modal, #full-edit-modal').on('click', function(e) {
+                if (e.target === this) { $('#full-edit-modal').hide(); }
+            });
+
+            $('#full-edit-form').on('submit', function(e) {
+                e.preventDefault();
+                let id = $('#full-student-id').val();
+                $.ajax({
+                    url: `/student/${id}`,
+                    type: 'POST',
+                    data: $(this).serialize() + '&_method=PUT',
+                    success: function(response) {
+                        $('#full-edit-modal').hide();
+                        toastr.success("Student updated successfully!");
+                        let currentUrl = $('#filter-form').attr('action') + '?' + $('#filter-form').serialize();
+                        fetchStudents(currentUrl);
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            let errorHtml = '<ul style="list-style:none; padding-left:0;">';
+                            $.each(errors, function(key, val) { errorHtml += `<li>⚠️ ${val[0]}</li>`; });
+                            errorHtml += '</ul>';
+                            $('#full-edit-modal-errors').html(errorHtml).show();
+                        } else {
+                            toastr.error("Update failed.");
+                        }
+                    }
+                });
+            });
+
+            // --- QUICK EDIT AJAX ---
             $(document).on('click', '.quick-edit-student-btn', function() {
                 let id = $(this).data('id');
                 $('#quick-modal-errors').hide().empty();
 
                 $.ajax({
-                    url: `/student/${id}/edit`, // একই এডিট রুট ব্যবহার করা হয়েছে ডাটা আনার জন্য
+                    url: `/student/${id}/edit`, 
                     type: 'GET',
+                    data: { ajax: true },
                     success: function(data) {
                         $('#quick-student-id').val(data.id);
                         $('#q-name').val(data.name);
@@ -355,21 +425,20 @@
 
                         $('#quick-edit-modal').css('display', 'flex');
                     },
-                    error: function() {
-                        toastr.error("Failed to fetch data.");
-                    }
+                    error: function() { toastr.error("Failed to fetch data."); }
                 });
             });
 
-            // ==========================================
-            // NEW: Specific Quick Edit Form Submit
-            // ==========================================
+            $('#close-quick-modal, #quick-edit-modal').on('click', function(e) {
+                if (e.target === this) { $('#quick-edit-modal').hide(); }
+            });
+
             $('#quick-edit-form').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#quick-student-id').val();
 
                 $.ajax({
-                    url: `/student/${id}/quick-update`, // সম্পূর্ণ নতুন কাস্টম ব্যাকএন্ড রুট
+                    url: `/student/${id}/quick-update`, 
                     type: 'PUT', 
                     data: $(this).serialize(),
                     success: function(response) {
@@ -382,56 +451,20 @@
                         if (xhr.status === 422) {
                             let errors = xhr.responseJSON.errors;
                             let errorHtml = '<ul style="list-style:none; padding-left:0;">';
-                            $.each(errors, function(key, val) {
-                                errorHtml += `<li>⚠️ ${val[0]}</li>`;
-                            });
+                            $.each(errors, function(key, val) { errorHtml += `<li>⚠️ ${val[0]}</li>`; });
                             errorHtml += '</ul>';
                             $('#quick-modal-errors').html(errorHtml).show();
                         } else {
-                            toastr.error("An error occurred. Please try again.");
+                            toastr.error("An error occurred.");
                         }
                     }
                 });
             });
 
-            // Form Submit (Full Store & Update)
-            $('#student-form').on('submit', function(e) {
-                e.preventDefault();
-                let id = $('#student-id').val();
-                let method = $('#form-method').val();
-                let url = method === 'POST' ? '/student' : `/student/${id}`;
-
-                $.ajax({
-                    url: url,
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function(response) {
-                        $('#student-modal').hide();
-                        toastr.success(response.success);
-                        let currentUrl = $('#filter-form').attr('action') + '?' + $('#filter-form').serialize();
-                        fetchStudents(currentUrl);
-                    },
-                    error: function(xhr) {
-                        if (xhr.status === 422) {
-                            let errors = xhr.responseJSON.errors;
-                            let errorHtml = '<ul style="list-style:none; padding-left:0;">';
-                            $.each(errors, function(key, val) {
-                                errorHtml += `<li>⚠️ ${val[0]}</li>`;
-                            });
-                            errorHtml += '</ul>';
-                            $('#modal-errors').html(errorHtml).show();
-                        } else {
-                            toastr.error("An error occurred. Please try again.");
-                        }
-                    }
-                });
-            });
-
-            // Delete Student via AJAX
+            // --- DELETE AJAX ---
             $(document).on('click', '.delete-student-btn', function() {
                 if (confirm('Are you sure you want to delete this student?')) {
                     let id = $(this).data('id');
-
                     $.ajax({
                         url: `/student/${id}`,
                         type: 'DELETE',
@@ -440,9 +473,7 @@
                             let currentUrl = $('#filter-form').attr('action') + '?' + $('#filter-form').serialize();
                             fetchStudents(currentUrl);
                         },
-                        error: function() {
-                            toastr.error("Could not delete student.");
-                        }
+                        error: function() { toastr.error("Could not delete student."); }
                     });
                 }
             });

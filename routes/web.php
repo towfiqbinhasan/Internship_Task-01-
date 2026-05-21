@@ -10,11 +10,12 @@ Route::get('/', function () {
 // Student CRUD Routes Group
 Route::prefix('student')->controller(StudentController::class)->group(function () {
     Route::get('/', 'index')->name('student.index');
+    Route::get('/create', 'create')->name('student.create'); 
     Route::post('/', 'store')->name('student.store');
-    Route::get('/{id}/edit', 'edit')->name('student.edit');
+    Route::get('/{id}/edit', 'edit')->name('student.edit'); 
     Route::put('/{id}', 'update')->name('student.update');
     Route::delete('/{id}', 'destroy')->name('student.destroy');
-    Route::put('/student/{id}/quick-update', [StudentController::class, 'quickUpdate'])->name('student.quickUpdate');
+    Route::put('/{id}/quick-update', 'quickUpdate')->name('student.quickUpdate'); 
 });
 //  Route::get('about-us', function () {
 //$name = "Tester";
